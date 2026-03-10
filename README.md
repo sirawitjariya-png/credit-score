@@ -22,6 +22,7 @@ This project simulates a **production-style credit scoring system** that:
 
 The API receives customer information and returns a **credit risk score**.
 
+![development_pipeline](pic/development_pipeline.png)
 ---
 
 ## Tech Stack
