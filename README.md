@@ -1,4 +1,4 @@
-# Credit Scoring API
+# Credit Scoring
 
 A machine learning credit scoring system deployed as a REST API using FastAPI.
 
