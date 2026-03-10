@@ -1,10 +1,7 @@
 // ...existing code...
-data/*
-models/trained_models/*
+# data/*
 *.ipynb_checkpoints
-*.pkl
-.env
-// ...existing code...
+# *.pkl
 
 # Byte-compiled / caches
 __pycache__/

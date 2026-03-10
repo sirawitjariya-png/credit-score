@@ -123,6 +123,55 @@ pip install -r requirements.txt
 ```
 
 ---
+## Dataset
+[10K_Lending_Club_Loans.csv](data/raw/10K_Lending_Club_Loans.csv)
+
+**Target Variable**
+
+`is_bad`
+
+- 1 = bad loan (default)
+- 0 = good loan (fully paid)
+This is the target variable for your credit scoring model.
+
+<br></br>
+**Dataset Feature Description**
+
+
+| Column Name              | Description                                                              |
+| ------------------------ | ------------------------------------------------------------------------ |
+| `loan_amnt`              | The amount of the loan applied for by the borrower.                      |
+| `funded_amnt`            | The total amount funded by investors for the loan.                       |
+| `term`                   | Loan repayment period, typically 36 or 60 months.                        |
+| `int_rate`               | Interest rate assigned to the loan, reflecting borrower risk level.      |
+| `installment`            | Monthly payment amount owed by the borrower.                             |
+| `grade`                  | Lending Club credit grade ranging from A (low risk) to G (high risk).    |
+| `sub_grade`              | A more granular sub-category of the credit grade (e.g., A1, B3).         |
+| `emp_title`              | Borrower's job title.                                                    |
+| `emp_length`             | Length of employment (e.g., `<1 year`, `3 years`, `10+ years`).          |
+| `home_ownership`         | Housing status such as RENT, OWN, or MORTGAGE.                           |
+| `annual_inc`             | Annual income reported by the borrower.                                  |
+| `verification_status`    | Indicates whether the borrower's income has been verified.               |
+| `purpose`                | Purpose of the loan (e.g., debt consolidation, credit card, car).        |
+| `title`                  | Borrower-provided title describing the loan purpose.                     |
+| `zip_code`               | Borrower ZIP code (partially masked).                                    |
+| `addr_state`             | State where the borrower resides.                                        |
+| `dti`                    | Debt-to-income ratio calculated as total monthly debt divided by income. |
+| `delinq_2yrs`            | Number of delinquent accounts in the last two years.                     |
+| `earliest_cr_line`       | Date of the borrower’s earliest credit account.                          |
+| `inq_last_6mths`         | Number of credit inquiries made in the last six months.                  |
+| `mths_since_last_delinq` | Months since the borrower's last delinquency.                            |
+| `mths_since_last_record` | Months since the borrower's last public record (e.g., bankruptcy).       |
+| `open_acc`               | Number of open credit accounts.                                          |
+| `pub_rec`                | Number of derogatory public records.                                     |
+| `revol_bal`              | Total revolving credit balance.                                          |
+| `revol_util`             | Revolving credit utilization rate (used credit / credit limit).          |
+| `total_acc`              | Total number of credit accounts ever opened.                             |
+| `initial_list_status`    | Loan listing status (`f` = fractional, `w` = whole).                     |
+| `policy_code`            | Internal policy code used by Lending Club.                               |
+
+
+---
 ## Run Data Exploration (Optional)
 notebook/01_data_exploration.ipynb
 
