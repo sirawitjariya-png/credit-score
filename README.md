@@ -178,9 +178,24 @@ notebook/01_data_exploration.ipynb
 
 This step explores:
 - missing values
+- cardinality
+- rare value features
 - feature distribution
 - target imbalance
 - correlation analysis
+- data format that should be pre-processing
+
+After performing exploratory data analysis (EDA), we applied feature selection to improve model performance, stability, and interpretability. The following types of features were removed:
+
+- `High Missing Values`: Features with a large proportion of missing data were excluded due to limited reliability and potential bias in imputation.
+
+- `High Cardinality Features`: Variables with too many unique categories (e.g., free-text fields) that cannot be effectively grouped or binned were removed to avoid overfitting and complexity in modeling.
+
+- `Low Variance (Single Unique Value)`: Features containing only one unique value were dropped, as they provide no predictive power.
+
+- `Redundant Features`: Highly correlated or duplicate features were removed to reduce multicollinearity and simplify the model.
+
+This process ensures that only meaningful, stable, and model-relevant features are retained for downstream modeling and scorecard development.
 
 ---
 ## Run Feature Selection and Pre-processing
@@ -193,14 +208,22 @@ This stage performs:
 - Weight of Evidence (WOE) transformation
 - monotonic processing
 
+We performed additional selection based on predictive power and multicollinearity:
+
+- `Low Information Value (IV)`: Features with low Information Value were removed, as they have weak predictive power in distinguishing between good and bad borrowers.
+
+- `High Correlation`: Highly correlated features were eliminated to reduce multicollinearity, ensuring model stability and improving interpretability of the scorecard.
+
+This step helps retain only the most informative and independent features for building a robust credit scoring model.
+
 Output: 
 ```
 data/processed/
-└── 10K_Lending_Club_Loans_optbinning.csv
+└── 10K_Lending_Club_Loans_optbinning.csv #Dataset with used features and WOE bin transformed
 ```
 ```
 data/artifacts/
-└── optbinning.pkl
+└── optbinning.pkl #Object for binning used features
 ```
 
 
@@ -217,22 +240,104 @@ This stage performs:
     - CatBoost
 - Best model selection
 
+After tuning, the best model was selected based on validation performance. This approach ensures:
+
+- Optimal hyperparameters for each model
+
+- Fair comparison across different algorithms
+
+- Robust and generalizable predictive performance
+
+The final selected model is used for credit scoring and deployment.
+
 Output:
 ```
 data/processed/
-├── data10K_Lending_Club_Loans_predicted.csv
-└── data10K_Lending_Club_Loans_predicted_bin.csv
+├── data10K_Lending_Club_Loans_predicted.csv # Dataset with prediction with original features value
+└── data10K_Lending_Club_Loans_predicted_bin.csv # Dataset with prediction with binned features value
 ```
 ```
 data/artifacts/
-├── feature_use.pkl
-├── logistic_model.pkl
+├── feature_use.pkl # Features used in model
+├── logistic_model.pkl # Final best model
 ```
 
+---
+## Dockerfile config
+
+```
+FROM python:3.13.5
+
+WORKDIR /app
+
+# install system dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
+# copy requirements first (faster builds)
+COPY requirements.txt .
+
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
+
+# copy project
+COPY . .
+
+EXPOSE 8000
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+```
 
 ---
-## Deploy docker file
-Build container
+## app.main detail
+
+scoring.py contains function to
+1. pre-processing
+2. binning
+3. predicting
+
+Which we can call score_customer to payload data to do all three above processes to get the prediction
+
+```
+from fastapi import FastAPI
+from pydantic import BaseModel
+from typing import List
+from app.scoring import score_customer
+
+app = FastAPI(
+    title="Credit Scoring API",
+    description="API for predicting credit score using trained model",
+    version="1.0"
+)
+
+
+class CustomerData(BaseModel):
+    data: List[dict]
+
+
+@app.get("/")
+def home():
+    return {"message": "Credit Scoring API is running"}
+
+
+@app.post("/score")
+def score(payload: CustomerData):
+
+    print("INPUT RECEIVED:")
+    print(payload.data)
+
+    predictions = score_customer(payload.data)
+
+    return {
+        "scores": predictions
+    }
+```
+
+---
+## Build container
+
 ```
 docker build -t credit-scoring .
 ```
@@ -245,6 +350,8 @@ Run Container
 docker run -p 8000:8000 credit-scoring
 ```
 ---
+
+
 
 
 ## Running the API
